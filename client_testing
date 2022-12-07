@@ -5,22 +5,22 @@
 #Author: Jakob Banta
 #Test Client Monit Configuration 
 
-echo "Installing required packages..." && yum -y install stress && echo "Packages installed." &&
+echo "Installing required packages..." && yum -y install stress >> /var/log/client-test.log && systemctl start sendmail && systemctl enable sendmail && yum install -y epel-release >> /var/log/client-test.log && yum install -y monit >> /var/log/client-test.log && yum install -y sendmail && systemctl enable monit && systemctl start monit && echo "Packages installed." &&
 
 #Kill SSH
-echo "Testing SSH..." ; systemctl stop sshd ; sleep 120 ; monit summary | grep ssh
+echo "Testing SSH..." ; systemctl stop sshd ; sleep 10 ; monit summary | grep SSH ; echo "SSH testing complete!"
 
 #Kill syslog
-echo "Testing syslog..." ; systemctl stop rsyslog ; sleep 120 ; monit summary | grep rsyslog
+echo "Testing syslog..." ; systemctl stop rsyslog ; sleep 10 ; monit summary | grep syslog ; echo "syslog testing complete!"
 
 #Kill NFS-Client
-echo "Testing NFS client..." ; systemctl stop nfs ; sleep 120 ; monit summary | grep nfs ; echo "NFS-Client testing complete!"
+echo "Testing NFS client..." ; systemctl stop nfs ; sleep 10 ; monit summary | grep NFS ; echo "NFS-Client testing complete!"
 
 #Kill LDAP-Client
-echo "Testing LDAP client..." ; systemctl stop nscd ; sleep 120 ; monit summary | grep nscd ; echo "LDAP-Client testing complete!"
+echo "Testing LDAP client..." ; systemctl stop nscd ; sleep 10 ; monit summary | grep LDAP ; echo "LDAP-Client testing complete!"
 
 #Overload CPU and MEM with stress tool
 echo "Testing CPU and memory usage..." ; stress --vm-bytes 256MB --cpu 100 --timeout 60s >&1 >> /var/log/client-test.log ; monit summary | grep localhost ; echo "CPU and MEM testing complete!"
 
 #Test hard drive alarm
-echo "Testing disk usage.." ; dd if=/dev/zero of=/dev/diskhog bs=1M count=100000 2>&1 >> /var/log/client-test.log ; sleep 120 ; monit summary | grep Home ; monit summary | grep Root ; monit summary | grep Var ; rm /dev/diskhog -f >&1 >> /var/log/client-test.log ; echo "Disk usage testing complete!"
+echo "Testing disk usage.." ; dd if=/dev/zero of=/dev/diskhog bs=1M count=100000 2>&1 >> /var/log/client-test.log ; sleep 20 ; monit summary | grep HOME ; monit summary | grep ROOT ; monit summary | grep VAR ; rm /dev/diskhog -f >&1 >> /var/log/client-test.log ; echo "Disk usage testing complete!"
